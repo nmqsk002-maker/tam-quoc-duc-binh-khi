@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tam Quốc Đúc Binh Khí - Kiếm Tiền</title>
+    <script src="https://telegram.org"></script>
+    <script src="https://adsgram.ai"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle, #1a1a26 0%, #0d0d13 100%);
+            color: #ffffff;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #header {
+            background: rgba(30, 30, 45, 0.95);
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ffaa00;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            z-index: 5;
+        }
+        #user-info { font-weight: bold; color: #00ffcc; font-size: 14px; }
+        #resource-bar { display: flex; gap: 8px; font-weight: bold; }
+        .res-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            font-size: 12px;
+        }
+        #forge-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 20px;
+            z-index: 1;
+        }
+        #anvil {
+            width: 150px;
+            height: 120px;
+            background: linear-gradient(135deg, #444 0%, #222 100%);
+            clip-path: polygon(10% 0%, 90% 0%, 100 70%, 80% 70%, 90% 100%, 10% 100%, 20% 70%, 0% 70%);
+            border: 2px solid #555;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #ff5500;
+            text-shadow: 0 0 10px #ff5500;
+            cursor: pointer;
+            transition: transform 0.05s;
+        }
+        #anvil:active { transform: scale(0.92); }
+        #weapon-display {
+            width: 90%;
+            max-width: 320px;
+            background: rgba(25, 25, 35, 0.95);
+            border-radius: 15px;
+            border: 2px solid #444;
+            padding: 15px;
+            margin-top: 25px;
+            text-align: center;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .w-name { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+        .w-rarity { font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .w-power { color: #00ffcc; font-size: 14px; font-weight: bold; }
+        #action-box { display: flex; gap: 10px; margin-top: 10px; justify-content: center; width: 100%; }
+        .act-btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 12px; flex: 1; }
+        .btn-sell { background: #ffaa00; color: #111; }
+        #side-menu { position: absolute; top: 15px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 2; }
+        .circle-btn {
+            width: 42px; height: 42px; border-radius: 50%; background: #1e1e2d; border: 2px solid #ffaa00;
+            color: #ffaa00; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+        .popup-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,10,15,0.96);
+            display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding: 20px;
+        }
+        .popup-content { background: #1c1c27; border: 2px solid #ffaa00; border-radius: 16px; padding: 20px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
+        .popup-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #ffaa00; }
+        .task-row { background: #252535; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
+        .task-lbl { text-align: left; font-size: 12px; font-weight: bold; }
+        .btn-claim { background: #00ffcc; color: #111; border: none; padding: 6px 12px; font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        .btn-main { background: linear-gradient(90deg, #ffaa00 0%, #ff7700 100%); color: #111; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 25px; margin-top: 10px; cursor: pointer; width: 100%; }
+        .tier-0 { color: #aaaaaa; }
+        .tier-1 { color: #00ff66; }
+        .tier-2 { color: #00bfff; }
+        .tier-3 { color: #cc33ff; }
+        .tier-4 { color: #ffaa00; }
+        .tier-5 { color: #ff0055; text-shadow: 0 0 10px rgba(255,0,85,0.5); }
+    </style>
+</head>
+<body>
+
+<div id="header">
+    <div id="user-info">Chúa Công: <span id="player-name">Ẩn Danh</span></div>
+    <div id="resource-bar">
+        <div class="res-item">🪙 Vàng: <span id="lbl-gold">0</span></div>
+        <div class="res-item">💎 Đá rèn: <span id="lbl-iron">20</span></div>
+    </div>
+</div>
+
+<div id="forge-container">
+    <!-- MENU BIỂU TƯỢNG GÓC PHẢI (Đã thêm nút Nhóm Chat 💬 trên cùng) -->
+    <div id="side-menu">
+        <div class="circle-btn" onclick="openGroupChatLink()">💬</div>
+        <div class="circle-btn" onclick="openPopup('pop-referral')">👥</div>
+        <div class="circle-btn" onclick="openPopup('pop-tasks')">📜</div>
+        <div class="circle-btn" onclick="openPopup('pop-upgrade')">⚒️</div>
+        <div class="circle-btn" onclick="openPopup('pop-cash')">💵</div>
+    </div>
+
+    <div id="anvil" onclick="forgeWeapon()">ĐẬP ĐÊ</div>
+
+    <div id="weapon-display">
+        <div id="w-empty" style="color: #666; font-style: italic;">Hãy chạm vào Đe Rèn để bắt đầu đúc binh khí thần binh!</div>
+        <div id="w-result" style="display: none;">
+            <div id="res-name" class="w-name">Thanh Long Đao</div>
+            <div id="res-rarity" class="w-rarity">Truyền Thuyết</div>
+            <div id="res-power" class="w-power">⚔️ Sát thương: +1,250</div>
+            <div id="action-box">
+                <button class="act-btn btn-sell" onclick="sellWeapon()">BÁN LẤY VÀNG</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP MỜI BẠN BÈ -->
+    <div class="popup-layer" id="pop-referral">
+        <div class="popup-content">
+            <div class="popup-title">Chiêu Mộ Đồng Minh</div>
+            <p style="font-size:12px; color:#aaa; margin-bottom:15px;">Mời 1 bạn bè nhận ngay <span style="color:#00ffcc;">+50 Đá rèn</span> và hưởng <span style="color:#ffaa00;">3% hoa hồng</span> số vàng họ đúc được!</p>
+            <button class="btn-main" onclick="shareInviteLink()">GỬI LINK MỜI BẠN BÈ</button>
+            <div style="font-size:14px; font-weight:bold; margin: 15px 0 5px 0; text-align:left; color:#ffaa00;">Đồng minh của bạn (<span id="lbl-friend-count">0</span>):</div>
+            <div id="friend-list-container" style="max-height: 120px; overflow-y: auto; margin-bottom: 15px; width: 100%;">
+                <div style="font-size:11px; color:#666; font-style:italic; padding:10px;">Chưa có đồng minh nào tham gia thế lực...</div>
+            </div>
+            <button class="btn-main" style="background:#444; color:#fff;" onclick="closePopups()">Quay Lại Game</button>
+        </div>
+    </div>
+
+    <!-- POPUP NHIỆM VỤ XEM QUẢNG CÁO -->
+    <div class="popup-layer" id="pop-tasks">
+        <div class="popup-content">
+            <div class="popup-title">Nhiệm Vụ Kiếm Đá</div>
+            <div class="task-row">
+                <div class="task-lbl">Xem Video tiếp tế kho khoáng<br><span style="color:#00ffcc;">+10 Đá rèn</span></div>
+                <button class="btn-claim" onclick="watchAdVideo()">Xem</button>
+            </div>
+            <button class="btn-main" style="background:#444; color:#fff;" onclick="closePopups()">Quay Lại Game</button>
+        </div>
+    </div>
+
+    <!-- POPUP NÂNG CẤP ĐE RÈN -->
+    <div class="popup-layer" id="pop-upgrade">
+        <div class="popup-content">
+            <div class="popup-title">Nâng Cấp Lò Rèn</div>
+            <p style="font-size:13px; color:#aaa; margin-bottom:10px;">Tăng tỷ lệ đúc ra binh khí Thần Thoại</p>
+            <div style="font-size:16px; font-weight:bold; margin-bottom:15px; color:#ffaa00;">Cấp Đe Hiện Tại: Lv.<span id="lbl-forge-lv">1</span></div>
+            <button class="btn-main" id="btn-upgrade-forge" onclick="upgradeForgeAnvil()">Nâng Cấp: 150 Vàng</button>
+            <button class="btn-main" style="background:#444; color:#fff;" onclick="closePopups()">Quay Lại Game</button>
+        </div>
+    </div>
+
+    <!-- POPUP ĐỔI THƯỞNG LIÊN KẾT NGÂN HÀNG (KHÔI PHỤC NÚT BẤM) -->
+    <div class="popup-layer" id="pop-cash">
+        <div class="popup-content">
+            <div class="popup-title">Kho Bạc Quy Đổi</div>
+            <p style="font-size:12px; color:#aaa; margin-bottom:15px;">Tỷ lệ đổi: 1,000,000 vàng = 10,000đ</p>
+            <div style="font-size:15px; font-weight:bold; margin-bottom:25px;">Ví của bạn: <span id="lbl-cash-gold" style="color:#ffaa00;">0</span> Vàng</div>
+            <!-- ĐÂY LÀ NÚT BẤM BỊ THIẾU TRÊN MÀN HÌNH CỦA BẠN -->
+            <button class="btn-main" onclick="withdrawToWallet()">Rút Tiền Về Ngân Hàng (Chờ Duyệt)</button>
+            <button class="btn-main" style="background:#444; color:#fff;" onclick="closePopups()">Quay Lại Game</button>
+        </div>
+    </div>
+
+<script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) { tg.expand(); tg.ready(); if (tg.initDataUnsafe?.user?.first_name) { document.getElementById('player-name').innerText = tg.initDataUnsafe.user.first_name; } }
+
+    const WEAPON_PREFIX = ["Thanh Long", "Phương Thiên", "Xà Mâu", "Cổ Định", "Ý Thiên", "Song Cổ", "Bá Vương", "Hán Vương"];
+    const WEAPON_TYPES = ["Kiếm", "Đao", "Kích", "Thương", "Trùy", "Cung", "Rìu"];
+    
+    const RARITY_CONFIG = [
+        { name: "Thường", price: 10, power: 50, colorClass: "tier-0" },
+        { name: "Hiếm", price: 25, power: 150, colorClass: "tier-1" },
+        { name: "Cực Phẩm", price: 60, power: 350, colorClass: "tier-2" },
+        { name: "Sử Thi", price: 150, power: 800, colorClass: "tier-3" },
+        { name: "Truyền Thuyết", price: 400, power: 2000, colorClass: "tier-4" },
+        { name: "Thần Thoại VIP", price: 1200, power: 5000, colorClass: "tier-5" }
+    ];
+
+    const DROP_RATES = {
+        1: [0.60, 0.25, 0.10, 0.04, 0.01, 0.00],
+        2: [0.40, 0.30, 0.18, 0.08, 0.03, 0.01],
+        3: [0.20, 0.30, 0.25, 0.15, 0.07, 0.03],
+        4: [0.05, 0.15, 0.30, 0.25, 0.15, 0.10],
+        5: [0.00, 0.05, 0.15, 0.30, 0.30, 0.20]
+    };
+
+    let gold = 0, iron = 20, forgeLevel = 1, currentCreatedWeapon = null, invitedFriends = [];
+
+    // KHU VỰC CẤU HÌNH TOKEN VÀ LINK (TẬP TRUNG TỪ DÒNG NÀY)
+    const BOT_TOKEN = "8664655785:AAGiJFRdeRnwD1BPXvK9c_WTSJa95siP0f4";             // Token Bot lấy từ @BotFather
+    const ADMIN_CHAT_ID = "7865006773";                   // ID Telegram nhận thông báo thành viên mới
+    const MY_PERSONAL_CHAT_ID = "7865006773";             // ID Telegram cá nhân nhận lệnh duyệt rút tiền ngân hàng
+    const ADSGRAM_BLOCK_ID = "33655 TMA";    // Block ID vị trí quảng cáo trên Adsgram.ai
+    const TELEGRAM_APP_LINK = "https://t.me/Binhkhi_bot/Game";   // Link Mini App thật của bạn
+    const MY_GROUP_CHAT_URL = "https://t.me/baoappfreekonap"; // Link Nhóm Chat Cộng Đồng của bạn khi bấm nút 💬
+
+    function saveGameData() {
+        const gameData = { gold: gold, iron: iron, forgeLevel: forgeLevel, invitedFriends: invitedFriends };
+        localStorage.setItem('tamquoc_forge_savedata', JSON.stringify(gameData));
+    }
+
+    function loadGameData() {
+        const savedData = localStorage.getItem('tamquoc_forge_savedata');
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                gold = data.gold !== undefined ? data.gold : 0;
+                iron = data.iron !== undefined ? data.iron : 20;
+                forgeLevel = data.forgeLevel !== undefined ? data.forgeLevel : 1;
+                invitedFriends = data.invitedFriends !== undefined ? data.invitedFriends : [];
+            } catch (e) {
+                gold = 0; iron = 20; forgeLevel = 1; invitedFriends = [];
+            }
+        }
+        collectUserData();
+        if (tg) {
+            let startParam = tg.initDataUnsafe?.start_param;
+            let myId = tg.initDataUnsafe?.user?.id;
+            let isRefProcessed = localStorage.getItem('tamquoc_ref_processed');
+            if (startParam && startParam !== myId && !isRefProcessed) {
+                iron += 50;
+                localStorage.setItem('tamquoc_ref_processed', 'true');
+                alert("Bạn được mời bởi một vị Chúa Công khác! Nhận ngay phần thưởng tân thủ +50 Đá Rèn.");
+                saveGameData();
+            }
+        }
+        updateUI();
+        renderFriendList();
+    }
+
+    function collectUserData() {
+        if (!tg) return;
+        let isUserRegistered = localStorage.getItem('tamquoc_user_registered');
+        if (isUserRegistered === 'true') return;
+
+        let uId = tg.initDataUnsafe?.user?.id || "Không rõ ID";
+        let firstName = tg.initDataUnsafe?.user?.first_name || "Không tên";
+        let lastName = tg.initDataUnsafe?.user?.last_name || "";
+        let uName = tg.initDataUnsafe?.user?.username ? "@" + tg.initDataUnsafe?.user?.username : "Không có Username";
+        let fullName = (firstName + " " + lastName).trim();
+
+        let logText = `🔔 *THÀNH VIÊN MỚI THAM GIA MINI APP* 🔔\n\n` +
+                      `🆔 ID Telegram: \`${uId}\`\n` +
+                      `👤 Tên nhân vật: *${fullName}*\n` +
+                      `💬 Username: ${uName}\n` +
+                      `📅 Trạng thái: Đang hoạt động`;
+
+        let url = `https://telegram.org{BOT_TOKEN}/sendMessage`;
+        fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: logText, parse_mode: "Markdown" }) })
+        .then(response => { if (response.ok) { localStorage.setItem('tamquoc_user_registered', 'true'); } })
+        .catch(err => console.error(err));
+    }
+
+    function updateUI() {
+        document.getElementById('lbl-gold').innerText = gold.toLocaleString();
+        document.getElementById('lbl-iron').innerText = iron.toLocaleString();
+        document.getElementById('lbl-forge-lv').innerText = forgeLevel;
+        document.getElementById('lbl-cash-gold').innerText = gold.toLocaleString();
+        
+        let upCost = forgeLevel * 150;
+        let upBtn = document.getElementById('btn-upgrade-forge');
+        if (forgeLevel >= 5) {
+            upBtn.innerText = "ĐÃ ĐẠT CẤP TỐI ĐA (LV.5)";
+            upBtn.disabled = true;
+        } else {
+            upBtn.innerText = `Nâng Cấp: ${upCost} Vàng`;
+        }
+    }
+
+    function openPopup(id) { closePopups(); document.getElementById(id).style.display = 'flex'; }
+    function closePopups() { document.querySelectorAll('.popup-layer').forEach(p => p.style.display = 'none'); }
+
+    function openGroupChatLink() {
+        if (tg) { tg.openTelegramLink(MY_GROUP_CHAT_URL); } 
+        else { window.open(MY_GROUP_CHAT_URL, '_blank'); }
+    }
+
+    function forgeWeapon() {
+        if (iron <= 0) { alert("Đã hết Đá rèn! Hãy làm nhiệm vụ xem video quảng cáo để nhận thêm khoáng thạch."); return; }
+        iron--;
+        saveGameData();
+        
+        let rates = DROP_RATES[forgeLevel];
+        let rand = Math.random();
+        let cumulative = 0;
+        let selectedTier = 0;
+
+        for (let i = 0; i < rates.length; i++) {
+            cumulative += rates[i];
+            if (rand <= cumulative) { selectedTier = i; break; }
+        }
+
+        let tierData = RARITY_CONFIG[selectedTier];
+        let wName = WEAPON_PREFIX[Math.floor(Math.random() * WEAPON_PREFIX.length)] + " " + WEAPON_TYPES[Math.floor(Math.random() * WEAPON_TYPES.length)];
+        let wPower = Math.floor(Math.random() * (tierData.power * 1.5 - tierData.power + 1)) + tierData.power;
+
+        currentCreatedWeapon = { name: wName, rarity: tierData.name, power: wPower, price: tierData.price, colorClass: tierData.colorClass };
+
+        document.getElementById('w-empty').style.display = 'none';
+        let resBox = document.getElementById('w-result');
+        resBox.style.display = 'block';
+        
+        let nameLbl = document.getElementById('res-name');
+        nameLbl.innerText = currentCreatedWeapon.name;
+        nameLbl.className = "w-name " + currentCreatedWeapon.colorClass;
+
+        let rarityLbl = document.getElementById('res-rarity');
+        rarityLbl.innerText = currentCreatedWeapon.rarity;
+        rarityLbl.className = "w-rarity " + currentCreatedWeapon.colorClass;
+
+        document.getElementById('res-power').innerText = `⚔️ Sát thương: +${currentCreatedWeapon.power.toLocaleString()}`;
+        document.querySelector('.btn-sell').innerText = `BÁN LẤY +${currentCreatedWeapon.price} VÀNG`;
+
+        updateUI();
+    }
+
+    function sellWeapon() {
+        if (!currentCreatedWeapon) return;
+        let commisAmount = Math.ceil(currentCreatedWeapon.price * 0.03);
+        if (invitedFriends.length > 0) {
+            let randomFriendIdx = Math.floor(Math.random() * invitedFriends.length);
+            invitedFriends[randomFriendIdx].commission += commisAmount;
+            renderFriendList();
+        }
+        gold += currentCreatedWeapon.price;
+        currentCreatedWeapon = null;
+        document.getElementById('w-result').style.display = 'none';
+        document.getElementById('w-empty').style.display = 'block';
+        saveGameData();
+        updateUI();
+    }
+
+    function upgradeForgeAnvil() {
+        if (forgeLevel >= 5) return;
+        let cost = forgeLevel * 150;
+        if (gold < cost) { alert("Không đủ ngân lượng vàng để nâng cấp Đe Rèn!"); return; }
+        gold -= cost;
+        forgeLevel++;
+        saveGameData();
+        updateUI();
+    }
+
+    function watchAdVideo() {
+        const AdController = window.Adsgram?.init({ blockId: ADSGRAM_BLOCK_ID });
+        if (AdController) {
+            AdController.show().then((result) => {
+                iron += 10; saveGameData(); updateUI(); alert("Nhận thành công 10 Đá rèn tiếp tế quân lương!"); closePopups();
+            }).catch((err) => {
+                alert("Quảng cáo lỗi hoặc bị hủy giữa chừng. Vui lòng thử lại!");
+            });
+        } else {
+            iron += 10; saveGameData(); updateUI(); alert("[Test Mode]: Bạn đã xem hết Video quảng cáo! Nhận +10 Đá rèn."); closePopups();
+        }
+    }
+
+    function withdrawToWallet() {
+        if (gold < 1000000) { 
+            alert("Số dư tối thiểu để quy đổi kho báu là 1,000,000 Vàng!"); 
+            return; 
+        }
+
+        let bankName = prompt("Nhập Tên Ngân Hàng (Ví dụ: Vietcombank, MBBank...):"); if (!bankName) return;
+        let bankAccount = prompt("Nhập Số Tài Khoản Ngân Hàng:"); if (!bankAccount) return;
+        let accountName = prompt("Nhập Tên Chủ Tài Khoản (Viết hoa không dấu):"); if (!accountName) return;
+
+        let pName = document.getElementById('player-name').innerText || "Ẩn Danh";
+        let uId = tg?.initDataUnsafe?.user?.id || "Không rõ ID";
+
+        // ĐIỀN CHUẨN THÔNG TIN TRONG DẤU NGOẶC KÉP CỦA BẠN:
+        const BOT_TOKEN = "8664655785:AAGiJFRdeRnwD1BPXvK9c_WTSJa95siP0f4"; // <-- Điền API Token từ BotFather
+        const MY_PERSONAL_CHAT_ID = "7865006773";   // <-- Điền dãy số ID Telegram cá nhân của bạn
+
+        let messageText = `🚨 *YÊU CẦU RÚT TIỀN MỚI* 🚨\n\n` +
+                          `👤 Chúa Công: ${pName} (ID: ${uId})\n` +
+                          `🪙 Số vàng rút: ${gold.toLocaleString()} Vàng\n` +
+                          `💵 Số tiền VND: 10,000đ\n\n` +
+                          `🏦 Ngân hàng: ${bankName}\n` +
+                          `💳 Số tài khoản: \`${bankAccount}\`\n` +
+                          `📛 Tên chủ TK: ${accountName.toUpperCase()}\n\n` +
+                          `👉 Hãy chuyển khoản 10k cho người này rồi bấm duyệt!`;
+
+        let cleanToken = BOT_TOKEN.trim();
+        let url = `https://telegram.org{cleanToken}/sendMessage`;
+        
+        fetch(url, { 
+            method: "POST", 
+            headers: { "Content-Type": "application/json" }, 
+            body: JSON.stringify({ chat_id: MY_PERSONAL_CHAT_ID.trim(), text: messageText, parse_mode: "Markdown" }) 
+        })
+        .then(response => {
+            if (response.ok) {
+                gold -= 1000000; // Trừ tiền thật trong game sau khi gửi lệnh thành công
+                saveGameData(); 
+                updateUI();
+                alert("Đặt lệnh rút thành công! Thông tin liên kết ngân hàng đã được gửi tới hệ thống Bot duyệt."); 
+                closePopups();
+            } else { 
+                alert("Hệ thống lỗi! Vui lòng kiểm tra lại Token Bot hoặc ID Chat xem điền đúng chưa."); 
+            }
+        })
+        .catch(err => { 
+            alert("Lỗi kết nối mạng, vui lòng thử lại!"); 
+        });
+    }
+
+    function shareInviteLink() {
+        let myId = tg?.initDataUnsafe?.user?.id || "1234567";
+        let fullInviteLink = `${TELEGRAM_APP_LINK}?startapp=${myId}`;
+        let mockNames = ["Lưu Bị_9x", "Tào Tháo_Pro", "Tôn Quyền_Vip", "Quan Vũ_TD", "Trương Phi_Mobi"];
+        let randomName = mockNames[Math.floor(Math.random() * mockNames.length)] + ` (${Math.floor(Math.random()*900+100)})`;
+        
+        if (!invitedFriends.some(f => f.name.slice(0,4) === randomName.slice(0,4))) {
+            iron += 50; invitedFriends.push({ name: randomName, commission: 0 });
+            saveGameData(); updateUI(); renderFriendList();
+        }
+
+        if (tg) {
+            tg.openTelegramLink(`https://t.me{encodeURIComponent(fullInviteLink)}&text=${encodeURIComponent("Ta vừa đúc được Thần Binh Tam Quốc rớt toàn đồ Thần Thoại! Hãy bấm link để cùng nhận ngay 50 Kim Cương tân thủ miễn phí!")}`);
+        } else {
+            prompt("Hãy sao chép link mời này gửi cho bạn bè:", fullInviteLink);
+        }
+    }
+
+    function renderFriendList() {
+        const container = document.getElementById('friend-list-container');
+        document.getElementById('lbl-friend-count').innerText = invitedFriends.length;
+        if (invitedFriends.length === 0) {
+            container.innerHTML = `<div style="font-size:11px; color:#666; font-style:italic; padding:10px;">Chưa có đồng minh nào tham gia thế lực...</div>`;
+            return;
+        }
+        let html = "";
+        invitedFriends.forEach(f => {
+            html += `<div class="task-row" style="margin-bottom:6px; padding:8px 12px; background:#1e1e2b;">` +
+                    `<div class="task-lbl">👤 ${f.name}<br><span style="color:#666; font-size:10px;">Hoa hồng: 3%</span></div>` +
+                    `<div style="font-size:11px; font-weight:bold; color:#ffaa00;">+${f.commission.toLocaleString()} 🪙</div>` +
+                    `</div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    loadGameData();
+</script>
+</body>
+</html>
