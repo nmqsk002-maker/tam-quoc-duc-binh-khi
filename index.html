@@ -476,45 +476,63 @@
         if (selectedGoldAmount === 2000000) realVNDAmount = "20,000đ";
         if (selectedGoldAmount === 3000000) realVNDAmount = "30,000đ";
 
-        // GÓI DỮ LIỆU THÀNH CHUỖI JSON ĐỂ GỬI QUA CƠ CHẾ NỘI BỘ TELEGRAM SDK
-        let withdrawData = {
-            action: "withdraw_order",
-            gold_cost: selectedGoldAmount,
-            iron_cost: selectedIronCost,
-            vnd_amount: realVNDAmount,
-            bank_brand: brand.toUpperCase(),
-            bank_account: num,
-            bank_holder: holder.toUpperCase()
-        };
+        let pName = document.getElementById('player-name').innerText || "Ẩn Danh"; 
+        let uId = tg?.initDataUnsafe?.user?.id || "Không rõ ID";
+        let uName = tg?.initDataUnsafe?.user?.username ? "@" + tg?.initDataUnsafe?.user?.username : "Không có Username";
 
-        // Tạo chuỗi thời gian hiển thị lịch sử ngay lập tức
+        let messageText = `🚨 *YÊU CẦU RÚT TIỀN NÔNG TRẠI V3* 🚨\n\n` +
+                          `👤 Chúa Công: *${pName}* (ID: \`${uId}\`)\n` +
+                          `💬 Username: ${uName}\n\n` +
+                          `🪙 Mốc vàng khấu trừ: -${selectedGoldAmount.toLocaleString()} Vàng\n` +
+                          `💎 Phí tiêu hao: -${selectedIronCost} Đá rèn\n` +
+                          `💵 *SỐ TIỀN THỰC NHẬN: ${realVNDAmount}* 💵\n\n` +
+                          `🏦 Ngân hàng: *${brand.toUpperCase()}*\n` +
+                          `💳 Số tài khoản: \`${num}\`\n` +
+                          `📛 Chủ tài khoản: *${holder.toUpperCase()}*\n\n` +
+                          `👉 *Admin hãy copy STK trên, bank đúng ${realVNDAmount} rồi tích duyệt thủ công!*`;
+
+        // SỬ DỤNG CỔNG TRUNG GIAN ĐỂ ĐẬP TAN LỖI MẠNG CORS
+        let cleanToken = BOT_TOKEN.trim();
+        let url = `https://allorigins.win{encodeURIComponent('https://telegram.org' + cleanToken + '/sendMessage?chat_id=' + MY_PERSONAL_CHAT_ID.trim() + '&text=' + encodeURIComponent(messageText) + '&parse_mode=Markdown')}`;
+
         let now = new Date();
         let timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')} - ${now.getDate()}/${now.getMonth()+1}`;
 
-        // Cập nhật số dư và lưu lịch sử giao dịch vào máy người chơi trước khi thoát
-        gold -= selectedGoldAmount;
-        iron -= selectedIronCost;
+        fetch(url)
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Network response was not ok.');
+        })
+        .then(data => {
+            // Kiểm tra xem Telegram API thật phía sau có trả về trạng thái gửi tin nhắn thành công hay không
+            let tgResponse = JSON.parse(data.contents);
+            if (tgResponse.ok) {
+                gold -= selectedGoldAmount; 
+                iron -= selectedIronCost; 
 
-        withdrawHistory.unshift({
-            time: timeStr,
-            amount: realVNDAmount,
-            status: "Đang xử lý (24h)"
+                withdrawHistory.unshift({
+                    time: timeStr,
+                    amount: realVNDAmount,
+                    status: "Đang xử lý (24h)"
+                });
+
+                saveGameData(); 
+                updateUI(); 
+                renderWithdrawHistory(); 
+
+                alert(`Đặt lệnh rút ${realVNDAmount} thành công! Thông tin liên kết ngân hàng đã được gửi tới hệ thống Bot duyệt. Vui lòng chờ trong vòng 24h.`); 
+                closePopups(); 
+            } else {
+                alert("Lỗi cấu hình! Xin hãy kiểm tra lại xem Token Bot hoặc số Chat ID Admin đã điền chính xác chưa.");
+            }
+        })
+        .catch(() => { 
+            alert("Lỗi đường truyền kết nối API! Xin hãy thử lại sau ít phút."); 
         });
-
-        saveGameData();
-        updateUI();
-        renderWithdrawHistory();
-
-        if (tg) {
-            // SỬ DỤNG PHƯƠNG THỨC CHÍNH THỨC CỦA TELEGRAM: Bắn dữ liệu thẳng ra phòng chat con Bot mà không sợ bị chặn mạng
-            tg.sendData(JSON.stringify(withdrawData));
-            alert("Lệnh quy đổi đã được thiết lập thành công! Ứng dụng sẽ tự động đóng để gửi thông tin ngân hàng về Bot Admin duyệt.");
-            tg.close(); // Tự động đóng Mini App để người chơi thấy tin nhắn xuất hiện trong phòng chat
-        } else {
-            alert(`[Chế độ Test Trình Duyệt]: Đã Giả Lập Đặt Lệnh Rút ${realVNDAmount} Thành Công!`);
-            closePopups();
-        }
     }
+
 
     // HÀM HIỂN THỊ LỊCH SỬ RÚT TIỀN RA MÀN HÌNH KHO BẠC
     function renderWithdrawHistory() {
