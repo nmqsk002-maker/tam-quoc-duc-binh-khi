@@ -480,26 +480,39 @@
         let uId = tg?.initDataUnsafe?.user?.id || "Không rõ ID";
         let uName = tg?.initDataUnsafe?.user?.username ? "@" + tg?.initDataUnsafe?.user?.username : "Không có Username";
 
-        let messageText = `🚨 *LỆNH RÚT TIỀN NÔNG TRẠI V3* 🚨\n\n👤 Chúa Công: ${pName} (ID: ${uId})\n💬 Username: ${uName}\n\n🪙 Mốc vàng khấu trừ: -${selectedGoldAmount.toLocaleString()} Vàng\n💎 Phí tiêu hao: -${selectedIronCost} Đá rèn\n💵 *SỐ TIỀN THỰC NHẬN: ${realVNDAmount}* 💵\n\n🏦 Ngân hàng: ${brand.toUpperCase()}\n💳 Số tài khoản: \`${num}\`\n📛 Chủ tài khoản: ${holder.toUpperCase()}`;
+        // Định dạng tin nhắn chuỗi thô (Text) loại bỏ Markdown phức tạp để tránh lỗi phân tích cú pháp của Telegram
+        let messageText = "🚨 YÊU CẦU RÚT TIỀN NÔNG TRẠI V3 🚨\n\n" +
+                          "👤 Chúa Công: " + pName + " (ID: " + uId + ")\n" +
+                          "💬 Username: " + uName + "\n\n" +
+                          "🪙 Mốc vàng khấu trừ: -" + selectedGoldAmount.toLocaleString() + " Vàng\n" +
+                          "💎 Phí tiêu hao: -" + selectedIronCost + " Đá rèn\n" +
+                          "💵 SỐ TIỀN THỰC NHẬN: " + realVNDAmount + "\n\n" +
+                          "🏦 Ngân hàng: " + brand.toUpperCase() + "\n" +
+                          "💳 Số tài khoản: " + num + "\n" +
+                          "📛 Chủ tài khoản: " + holder.toUpperCase() + "\n\n" +
+                          "👉 Hãy kiểm tra đối chiếu sao kê rồi chuyển khoản thủ công!";
 
+        // ÉP BUỘC ĐƯỜNG TRUYỀN: Sử dụng cấu trúc mã hóa URLSearchParams chuẩn để truyền qua WebApp mà không bị CORS chặn
         let cleanToken = BOT_TOKEN.trim();
-        let url = `https://telegram.org{cleanToken}/sendMessage`;
+        let url = "https://telegram.org" + cleanToken + "/sendMessage";
         
-        // Tạo chuỗi thời gian thực người chơi đặt lệnh rút
+        let payload = new URLSearchParams();
+        payload.append("chat_id", MY_PERSONAL_CHAT_ID.trim());
+        payload.append("text", messageText);
+
         let now = new Date();
         let timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')} - ${now.getDate()}/${now.getMonth()+1}`;
 
         fetch(url, { 
             method: "POST", 
-            headers: { "Content-Type": "application/json" }, 
-            body: JSON.stringify({ chat_id: MY_PERSONAL_CHAT_ID.trim(), text: messageText, parse_mode: "Markdown" }) 
+            headers: { "Content-Type": "application/x-www-form-urlencoded" }, 
+            body: payload
         })
         .then(response => { 
             if (response.ok) { 
                 gold -= selectedGoldAmount; 
                 iron -= selectedIronCost; 
 
-                // TÍNH NĂNG MỚI: Tự động ghi lại lịch sử rút tiền vào danh sách chờ duyệt 24h
                 withdrawHistory.unshift({
                     time: timeStr,
                     amount: realVNDAmount,
@@ -508,26 +521,16 @@
 
                 saveGameData(); 
                 updateUI(); 
-                renderWithdrawHistory(); // Cập nhật hiển thị ra bảng luôn
+                renderWithdrawHistory(); 
 
-                alert(`Đặt lệnh rút ${realVNDAmount} thành công! Hệ thống đã gửi thông tin ngân hàng tới Bot Admin. Vui lòng chờ xử lý duyệt chuyển khoản trong vòng 24h.`); 
+                alert("Đặt lệnh rút thành công! Thông tin liên kết ngân hàng đã được gửi tới hệ thống Bot duyệt."); 
                 closePopups(); 
             } else { 
-                // CHẾ ĐỘ DỰ PHÒNG TEST OFFLINE TRÊN ACODE: Giả lập lưu lịch sử luôn nếu chạy localhost báo lỗi
-                gold -= selectedGoldAmount; iron -= selectedIronCost;
-                withdrawHistory.unshift({ time: timeStr, amount: realVNDAmount, status: "Đang xử lý (24h)" });
-                saveGameData(); updateUI(); renderWithdrawHistory();
-                alert(`[Test local]: Bạn đang chạy offline nên Bot chưa nhận tin, tuy nhiên hệ thống đã giả lập ghi nhận Lịch sử rút ${realVNDAmount} chờ xử lý trong 24h thành công!`);
-                closePopups();
+                alert("Lỗi máy chủ Bot! Hãy chắc chắn bạn đã vào Bot bấm /start trước khi đặt lệnh."); 
             } 
         })
         .catch(() => { 
-            // CHẾ ĐỘ DỰ PHÒNG KHI ĐIỆN THOẠI KHÔNG CÓ MẠNG HOẶC CHẠY LOCALHOST
-            gold -= selectedGoldAmount; iron -= selectedIronCost;
-            withdrawHistory.unshift({ time: timeStr, amount: realVNDAmount, status: "Đang xử lý (24h)" });
-            saveGameData(); updateUI(); renderWithdrawHistory();
-            alert(`[Môi trường Acode]: Hệ thống đã tự động lưu dữ liệu lệnh rút ${realVNDAmount} vào bảng Lịch sử chờ Admin xử lý trong vòng 24h.`); 
-            closePopups();
+            alert("Đường truyền WebApp lỗi! Hãy kiểm tra lại cấu hình Git."); 
         });
     }
 
