@@ -515,7 +515,9 @@
 
         // Tạo đường link lệnh mở cổng chát tự động điền tin nhắn của Telegram
         let telegramDeepLink = `https://t.me{botUsername}?start=${encodeURIComponent('rut_' + selectedGoldAmount + '_' + num)}`;
-        let directShareLink = `https://t.me{encodeURIComponent('https://t.me' + botUsername)}&text=${encodeURIComponent(messageText)}`;
+        // Bạn vào cài đặt Nhóm chat Admin vừa tạo ở Bước 1, copy link mời của nhóm dán vào đây:
+        let groupLink = "https://t.me/duyetruttientq"; 
+        let directShareLink = `https://t.me{encodeURIComponent(groupLink)}&text=${encodeURIComponent(messageText)}`;
 
         if (tg) {
             // Gọi lệnh hệ thống Telegram SDK mở thẳng khung chat chia sẻ điền sẵn tin nhắn ngân hàng
