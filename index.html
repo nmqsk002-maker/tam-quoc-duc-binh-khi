@@ -238,7 +238,7 @@
 
     // CẤU HÌNH BOT / LINK CỦA BẠN:
     const BOT_TOKEN = "8664655785:AAGiJFRdeRnwD1BPXvK9c_WTSJa95siP0f4"; 
-    const ADMIN_CHAT_ID = "-1003898772559"; 
+    const ADMIN_CHAT_ID = "7865006773"; 
     const MY_PERSONAL_CHAT_ID = "7865006773"; 
     const ADSGRAM_BLOCK_ID = "35708"; 
     const TELEGRAM_APP_LINK = "https://t.me/Binhkhi_bot/Game";
@@ -480,56 +480,67 @@
         let uId = tg?.initDataUnsafe?.user?.id || "Không rõ ID";
         let uName = tg?.initDataUnsafe?.user?.username ? "@" + tg?.initDataUnsafe?.user?.username : "Không có Username";
 
-        // Định dạng tin nhắn rút tiền chuẩn chỉnh gửi thẳng vào phòng chat con Bot của bạn
-        let messageText = `🚨 YÊU CẦU DUYỆT RÚT TIỀN NÔNG TRẠI 🚨\n\n` +
-                          `👤 Chúa Công: ${pName} (ID: ${uId})\n` +
+        // Định dạng nội dung tin nhắn Bot sẽ nhắn riêng cho bạn duyệt
+        let messageText = `🚨 *YÊU CẦU DUYỆT RÚT TIỀN NÔNG TRẠI* 🚨\n\n` +
+                          `👤 Chúa Công: *${pName}* (ID: \`${uId}\`)\n` +
                           `💬 Username: ${uName}\n\n` +
                           `🪙 Mốc vàng khấu trừ: -${selectedGoldAmount.toLocaleString()} Vàng\n` +
                           `💎 Phí tiêu hao: -${selectedIronCost} Đá rèn\n` +
-                          `💵 SỐ TIỀN THỰC NHẬN: ${realVNDAmount}\n\n` +
-                          `🏦 Ngân hàng: ${brand.toUpperCase()}\n` +
-                          `💳 Số tài khoản: ${num}\n` +
-                          `📛 Chủ tài khoản: ${holder.toUpperCase()}\n\n` +
-                          `👉 Hãy chuyển khoản đúng số tiền trên rồi tích duyệt thủ công!`;
+                          `💵 *SỐ TIỀN THỰC NHẬN: ${realVNDAmount}* 💵\n\n` +
+                          `🏦 Ngân hàng: *${brand.toUpperCase()}*\n` +
+                          `💳 Số tài khoản: \`${num}\`\n` +
+                          `#️⃣ Chủ tài khoản: *${holder.toUpperCase()}*\n\n` +
+                          `👉 *Admin hãy copy STK trên, bank đúng ${realVNDAmount} rồi tích duyệt thủ công!*`;
 
         let now = new Date();
         let timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')} - ${now.getDate()}/${now.getMonth()+1}`;
 
-        // Trừ tài sản trong game và cập nhật giao diện Lịch sử lưu vào máy người chơi
-        gold -= selectedGoldAmount; 
-        iron -= selectedIronCost; 
+        // ĐỊNH DẠNG ĐƯỜNG TRUYỀN XUYÊN TƯỜNG LỬA: Mượn server trung gian của Hàn Quốc (Cors.sh) để ném dữ liệu về Bot Telegram
+        let cleanToken = BOT_TOKEN.trim();
+        let targetTelegramUrl = `https://telegram.org{cleanToken}/sendMessage`;
+        
+        // Gọi lệnh qua Proxy Server để Telegram không thể chặn CORS đường truyền của WebApp
+        let proxyUrl = `https://cors.sh{targetTelegramUrl}`;
 
-        withdrawHistory.unshift({
-            time: timeStr,
-            amount: realVNDAmount,
-            status: "Đang xử lý (24h)"
+        fetch(proxyUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-cors-sh-api-key": "temp_ea6c2bf174092b7c472c68dfcb9b6db9" // Mã khóa Token Proxy công cộng miễn phí
+            },
+            body: JSON.stringify({
+                chat_id: MY_PERSONAL_CHAT_ID.trim(), // ID tài khoản Telegram của bạn
+                text: messageText,
+                parse_mode: "Markdown"
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                // Nếu lệnh ngầm gửi đi thành công -> Tiến hành trừ tiền của người chơi
+                gold -= selectedGoldAmount; 
+                iron -= selectedIronCost; 
+
+                withdrawHistory.unshift({
+                    time: timeStr,
+                    amount: realVNDAmount,
+                    status: "Đang xử lý (24h)"
+                });
+
+                saveGameData(); 
+                updateUI(); 
+                renderWithdrawHistory(); 
+
+                alert(`Đặt lệnh rút ${realVNDAmount} thành công! Thông tin liên kết ngân hàng đã được gửi ẩn về máy Admin. Vui lòng chờ xử lý duyệt chuyển khoản trong vòng 24h.`); 
+                closePopups(); 
+            } else {
+                alert("Lỗi cấu hình hệ thống! Chúa Công hãy kiểm tra lại mã Token Bot hoặc số Chat ID cá nhân trong file code.");
+            }
+        })
+        .catch(() => {
+            alert("Lỗi kết nối API đường truyền! Xin vui lòng thử lại sau ít phút.");
         });
-
-        saveGameData(); 
-        updateUI(); 
-        renderWithdrawHistory(); 
-
-        // TRÍCH XUẤT TÊN USERNAME CON BOT THẬT CỦA BẠN TỪ LINK ĐỂ ĐIỀU HƯỚNG CHUẨN XÁC
-        // Ví dụ link của bạn là https://t.me -> Tên bot là tamquoc_farm_bot
-        let botUsername = "Binhkhi_bot"; // <-- BẠN THAY TÊN USERNAME CON BOT CỦA BẠN VÀO ĐÂY (Bỏ chữ @ đi, ví dụ: "tamquoc_farm_bot")
-
-        // Tạo đường link lệnh mở cổng chát tự động điền tin nhắn của Telegram
-        let telegramDeepLink = `https://t.me{botUsername}?start=${encodeURIComponent('rut_' + selectedGoldAmount + '_' + num)}`;
-        // Bạn vào cài đặt Nhóm chat Admin vừa tạo ở Bước 1, copy link mời của nhóm dán vào đây:
-        let groupLink = "https://t.me/duyetruttientq"; 
-        let directShareLink = `https://t.me{encodeURIComponent(groupLink)}&text=${encodeURIComponent(messageText)}`;
-
-        if (tg) {
-            // Gọi lệnh hệ thống Telegram SDK mở thẳng khung chat chia sẻ điền sẵn tin nhắn ngân hàng
-            tg.openTelegramLink(directShareLink);
-            alert(`Lệnh rút ${realVNDAmount} đã được đóng gói! Trình duyệt sẽ tự động chuyển hướng Chúa Công ra phòng chat riêng, bạn chỉ cần bấm gửi tin nhắn đi để Admin duyệt bank tiền.`);
-            tg.close();
-        } else {
-            // Chế độ chạy thử nghiệm trên máy tính thường ngoài app Telegram
-            prompt("Hãy sao chép tin nhắn này gửi cho Bot của bạn:", messageText);
-            closePopups();
-        }
     }
+
 
     // HÀM HIỂN THỊ LỊCH SỬ RÚT TIỀN RA MÀN HÌNH KHO BẠC
     function renderWithdrawHistory() {
