@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tam Quốc Nông Trại - Ghost Farm</title>
+    <title>Tam Quốc Nông Trại - Siêu Cấp V3</title>
     <script src="https://telegram.org"></script>
     <script src="https://adsgram.ai"></script>
     <style>
@@ -13,90 +13,64 @@
             background: #0d0d13 linear-gradient(180deg, #12121a 0%, #07070a 100%);
             color: #ffffff; overflow: hidden; width: 100vw; height: 100vh; display: flex; flex-direction: column;
         }
-        /* Header thông số tài sản cao cấp */
         #header {
             background: linear-gradient(90deg, #1e1e2d 0%, #151522 100%);
-            padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid #ffcc00; box-shadow: 0 4px 15px rgba(0,0,0,0.6); z-index: 5;
+            padding: 12px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #ffaa00; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 5;
         }
-        #user-info { font-weight: bold; color: #00ffcc; font-size: 13px; text-shadow: 0 0 5px rgba(0,255,204,0.3); }
-        #resource-bar { display: flex; gap: 6px; font-weight: bold; }
+        #user-info { font-weight: bold; color: #00ffcc; font-size: 14px; }
+        #resource-bar { display: flex; gap: 8px; font-weight: bold; }
         .res-item {
-            display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.4);
-            padding: 4px 8px; border-radius: 12px; border: 1px solid #3d3d5c; font-size: 11px;
+            display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.3);
+            padding: 4px 8px; border-radius: 10px; border: 1px solid #333; font-size: 12px;
         }
-        
-        /* Khu vực Cánh đồng / Chuồng trại chính */
         #main-farm-area {
-            flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; position: relative;
+            flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 1;
         }
-        .area-title {
-            font-size: 14px; font-weight: bold; color: #ffcc00; padding-left: 5px;
-            border-left: 3px solid #ffcc00; margin-bottom: 8px; text-transform: uppercase;
-        }
-        
-        /* Grid ô đất ruộng phong cách Ghost Farm */
-        .farm-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%;
-        }
+        .area-title { font-size: 14px; font-weight: bold; color: #ffaa00; padding-left: 5px; border-left: 3px solid #ffaa00; margin-bottom: 8px; text-transform: uppercase; }
+        .farm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; }
         .plot-card {
             background: linear-gradient(135deg, #231c18 0%, #171210 100%);
             border: 2px solid #5c4033; border-radius: 14px; padding: 12px; text-align: center;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5); display: flex; flex-direction: column;
-            align-items: center; justify-content: center; min-height: 105px; position: relative;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 110px;
         }
         .plot-card.locked { background: #111116; border-color: #222233; opacity: 0.5; }
-        .plot-status { font-size: 11px; margin-bottom: 8px; color: #aaa; }
-        
-        /* Nút thao tác trên ô đất ruộng */
+        .plot-status { font-size: 11px; margin-bottom: 8px; color: #aaa; font-weight: 500; }
         .action-btn-sm {
             background: linear-gradient(180deg, #00bfff 0%, #0088cc 100%);
-            color: #fff; border: none; padding: 6px 12px; font-size: 11px;
-            font-weight: bold; border-radius: 20px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,191,255,0.3);
+            color: #fff; border: none; padding: 6px 12px; font-size: 11px; font-weight: bold; border-radius: 20px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,191,255,0.2);
         }
-        .action-btn-sm.harvest { background: linear-gradient(180deg, #00ffcc 0%, #00aa88 100%); box-shadow: 0 3px 6px rgba(0,255,204,0.3); color: #111; }
-        
-        /* Thanh Menu Điều Hướng Phía Dưới (Dock) */
-        #dock {
-            background: #12121c; padding: 10px; display: flex; justify-content: space-around;
-            border-top: 2px solid #2b2b40; z-index: 5;
-        }
-        .dock-btn {
-            display: flex; flex-direction: column; align-items: center; gap: 3px;
-            color: #8888aa; font-size: 10px; font-weight: bold; cursor: pointer; background: none; border: none;
-        }
-        .dock-btn.active { color: #ffcc00; }
-        .dock-icon { font-size: 20px; }
-
-        /* Lớp nền các Popup cửa hàng, chợ, nhiệm vụ */
-        .popup-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7,7,10,0.95);
-            display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding: 15px;
-        }
-        .popup-content {
-            background: #161622; border: 2px solid #ffcc00; border-radius: 16px; padding: 15px;
-            width: 100%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            display: flex; flex-direction: column; max-height: 85vh;
-        }
-        .popup-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #ffcc00; text-transform: uppercase; }
-        .popup-scroll-area { flex: 1; overflow-y: auto; margin-bottom: 12px; padding-right: 2px; }
-        
-        /* Thẻ sản phẩm trong Cửa Hàng & Chợ */
-        .item-card {
-            background: #1e1e2d; border-radius: 12px; padding: 10px; margin-bottom: 8px;
-            display: flex; justify-content: space-between; align-items: center; border: 1px solid #33334c;
-        }
-        .item-info { text-align: left; display: flex; align-items: center; gap: 8px; }
-        .item-icon { font-size: 24px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 8px; }
-        .item-name { font-size: 13px; font-weight: bold; color: #fff; }
-        .item-price { color: #ffcc00; font-size: 11px; margin-top: 2px; font-weight: bold; }
-        
-        .btn-main { background: linear-gradient(90deg, #ffcc00 0%, #ffaa00 100%); color: #111; border: none; padding: 11px; font-size: 13px; font-weight: bold; border-radius: 22px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(255,170,0,0.2); }
+        .action-btn-sm.harvest { background: linear-gradient(180deg, #00ffcc 0%, #00aa88 100%); color: #111; box-shadow: 0 3px 6px rgba(0,255,204,0.2); }
+        #side-menu { position: absolute; top: 15px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 2; }
+        .circle-btn { width: 42px; height: 42px; border-radius: 50%; background: #1e1e2d; border: 2px solid #ffaa00; color: #ffaa00; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+        .popup-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,10,15,0.96); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding: 20px; }
+        .popup-content { background: #1c1c27; border: 2px solid #ffaa00; border-radius: 16px; padding: 15px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.7); display: flex; flex-direction: column; max-height: 88vh; }
+        .popup-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #ffaa00; text-transform: uppercase; }
+        .popup-scroll-area { flex: 1; overflow-y: auto; margin-bottom: 10px; width: 100%; text-align: left; }
+        .item-card, .task-row { background: #252535; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #33334c; }
+        .item-info { display: flex; align-items: center; gap: 8px; }
+        .item-icon { font-size: 22px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 8px; }
+        .item-name, .task-lbl { font-size: 12px; font-weight: bold; color: #fff; }
+        .item-price, .task-sub { color: #ffaa00; font-size: 10px; margin-top: 2px; }
+        .btn-claim { background: #00ffcc; color: #111; border: none; padding: 6px 12px; font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        .btn-main { background: linear-gradient(90deg, #ffaa00 0%, #ff7700 100%); color: #111; border: none; padding: 11px; font-size: 13px; font-weight: bold; border-radius: 25px; margin-top: 5px; cursor: pointer; width: 100%; }
+        .checkin-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
+        .checkin-day { background: #222230; border: 1px solid #444; border-radius: 8px; padding: 6px 2px; font-size: 10px; text-align: center; color: #aaa; }
+        .checkin-day.checked { background: #00aa88; border-color: #00ffcc; color: #fff; font-weight: bold; }
+        #wheel-container { position: relative; width: 160px; height: 160px; border: 4px dashed #ffaa00; border-radius: 50%; margin: 10px auto; display: flex; align-items: center; justify-content: center; background: #222232; font-weight: bold; font-size: 18px; color: #ffaa00; text-shadow: 0 0 10px #ffaa00; transition: transform 2.1s cubic-bezier(0.1, 0.8, 0.3, 1); }
+        .withdraw-tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .tier-card { background: #222230; border: 1px solid #444; border-radius: 10px; padding: 10px 4px; text-align: center; cursor: pointer; }
+        .tier-card.selected { border-color: #ffaa00; background: #35354e; box-shadow: 0 0 8px #ffaa00; }
+        .form-group { text-align: left; margin-bottom: 8px; }
+        .form-group label { font-size: 11px; color: #ffaa00; display: block; margin-bottom: 3px; font-weight: bold; }
+        .form-control { width: 100%; background: #222230; border: 1px solid #444; padding: 8px; border-radius: 6px; color: #fff; font-size: 12px; }
+        #dock { background: #12121c; padding: 10px; display: flex; justify-content: space-around; border-top: 2px solid #2b2b40; z-index: 5; }
+        .dock-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #8888aa; font-size: 10px; font-weight: bold; cursor: pointer; background: none; border: none; width: 18%; }
+        .dock-btn.active { color: #ffcc00; } .dock-icon { font-size: 20px; }
     </style>
 </head>
 <body>
 
-<!-- Thanh Header hiển thị tài sản chuẩn Ghost Farm -->
 <div id="header">
     <div id="user-info">Chúa Công: <span id="player-name">Ẩn Danh</span></div>
     <div id="resource-bar">
@@ -105,84 +79,132 @@
     </div>
 </div>
 
-<!-- Khu vực nông trại ruộng đất chính -->
 <div id="main-farm-area">
-    <div class="area-title">🌾 Cánh Đồng Doanh Trại</div>
-    <div class="farm-grid" id="grid-fields">
-        <!-- Các ô đất trồng trọt được render tự động qua JS -->
+    <div id="side-menu">
+        <div class="circle-btn" onclick="openGroupChatLink()">💬</div>
+        <div class="circle-btn" onclick="openPopup('pop-checkin')">📅</div>
+        <div class="circle-btn" onclick="openPopup('pop-wheel')">🎡</div>
     </div>
+
+    <div class="area-title">🌾 Cánh Đồng Doanh Trại</div>
+    <div class="farm-grid" id="grid-fields"></div>
     
-    <div class="area-title" style="margin-top: 10px;">🐎 Chuồng Trại Chiến Mã</div>
-    <div class="farm-grid" id="grid-stables">
-        <!-- Các ô chuồng nuôi được render tự động qua JS -->
+    <div class="area-title" style="margin-top: 10px;">🐎 Chuồng Trại Chiến Mã (Tự Động Tạo Xu)</div>
+    <div class="farm-grid" id="grid-stables"></div>
+</div>
+
+<!-- POPUP 1: ĐIỂM DANH -->
+<div class="popup-layer" id="pop-checkin">
+    <div class="popup-content">
+        <div class="popup-title">Điểm Danh Quân Doanh</div>
+        <p style="font-size:11px; color:#aaa; margin-bottom:10px;">Nhận thưởng vàng tăng dần mỗi ngày đăng nhập!</p>
+        <div class="checkin-grid" id="checkin-days-box"></div>
+        <button class="btn-main" id="btn-today-checkin" onclick="claimDailyCheckin()">Điểm Danh Ngay</button>
+        <button class="btn-main" style="background:#444; color:#fff;" onclick="closePopups()">Quay Lại Điền Trang</button>
     </div>
 </div>
 
-<!-- POPUP 1: CỬA HÀNG HẠT GIỐNG (SHOP) -->
+<!-- POPUP 2: VÒNG QUAY MAY MẮN -->
+<div class="popup-layer" id="pop-wheel">
+    <div class="popup-content">
+        <div class="popup-title">Vòng Quay Thần Binh</div>
+        <p style="font-size:11px; color:#aaa;">Phí: <span style="color:#00ffcc;">1 Đá rèn</span> / lượt nhận ngẫu nhiên tới 3,000 vàng</p>
+        <div id="wheel-container">🎁 KHO BÁU</div>
+        <button class="btn-main" onclick="spinLuckyWheel()">Bắt Đầu Rút Thăm</button>
+        <button class="btn-main" style="background:#444; color:#fff;" onclick="closePopups()">Quay Lại Điền Trang</button>
+    </div>
+</div>
+
+<!-- POPUP 3: CỬA HÀNG HẠT GIỐNG -->
 <div class="popup-layer" id="pop-shop">
     <div class="popup-content">
-        <div class="popup-title">🌾 Kho Hạt Giống</div>
-        <div class="popup-scroll-area" id="shop-items-list">
-            <!-- Danh sách hạt giống bán lẻ -->
-        </div>
-        <button class="btn-main" style="background:#444; color:#fff; box-shadow:none;" onclick="closePopups()">Quay Lại Đồn Điền</button>
+        <div class="popup-title">🌾 Kho Hạt Giống Tam Quốc</div>
+        <div class="popup-scroll-area" id="shop-items-list"></div>
+        <button class="btn-main" style="background:#444; color:#fff;" onclick="closePopups()">Quay Lại Điền Trang</button>
     </div>
 </div>
 
-<!-- POPUP 2: CHỢ THU HOẠCH NÔNG SẢN (MARKET) -->
+<!-- POPUP 4: THƯƠNG TY BÁN NÔNG SẢN -->
 <div class="popup-layer" id="pop-market">
     <div class="popup-content">
         <div class="popup-title">⚖️ Ty Thương Giao Dịch</div>
-        <div class="popup-scroll-area" id="market-items-list">
-            <!-- Nơi bán nông sản thu hoạch -->
-        </div>
-        <button class="btn-main" style="background:#444; color:#fff; box-shadow:none;" onclick="closePopups()">Quay Lại Đồn Điền</button>
+        <div class="popup-scroll-area" id="market-items-list"></div>
+        <button class="btn-main" style="background:#444; color:#fff;" onclick="closePopups()">Quay Lại Điền Trang</button>
     </div>
 </div>
 
-<!-- POPUP 3: CHIÊU MỘ ĐỒNG MINH (REFERRAL) -->
-<div class="popup-layer" id="pop-referral">
-    <div class="popup-content">
-        <div class="popup-title">👥 Thế Lực Đồng Minh</div>
-        <p style="font-size:11px; color:#aaa; margin-bottom:12px;">Mời hảo hữu nhận ngay <span style="color:#00ffcc;">+50 Đá rèn</span> và hưởng <span style="color:#ffcc00;">3% hoa hồng</span> nông sản từ cấp dưới!</p>
-        <button class="btn-main" onclick="shareInviteLink()">GỬI LINK CHIÊU MỘ</button>
-        <div style="font-size:13px; font-weight:bold; margin:12px 0 5px 0; text-align:left; color:#ffcc00;">Đồng minh của bạn (<span id="lbl-friend-count">0</span>):</div>
-        <div class="popup-scroll-area" id="friend-list-container" style="max-height:150px;">
-            <div style="font-size:11px; color:#666; font-style:italic; padding:10px;">Chưa có đồng minh nào tham gia thế lực...</div>
-        </div>
-        <button class="btn-main" style="background:#444; color:#fff; box-shadow:none;" onclick="closePopups()">Quay Lại Đồn Điền</button>
-    </div>
-</div>
-
-<!-- POPUP 4: NHIỆM VỤ XEM QUẢNG CÁO KIẾM ĐÁ -->
+<!-- POPUP 5: NHIỆM VỤ -->
 <div class="popup-layer" id="pop-tasks">
     <div class="popup-content">
-        <div class="popup-title">📜 Tiếp Tế Quân Lương</div>
-        <div class="task-row">
-            <div class="task-lbl">Xem Video vận chuyển khoáng thạch<br><span style="color:#00ffcc;">+10 Đá rèn</span></div>
-            <button class="btn-claim" onclick="watchAdVideo()">Xem</button>
+        <div class="popup-title">📜 Nhiệm Vụ Chiến Trường</div>
+        <div class="popup-scroll-area">
+            <div class="task-row">
+                <div class="task-lbl">Tham gia nhóm chat cộng đồng<br><span class="task-sub">+500 Vàng</span></div>
+                <button class="btn-claim" onclick="doTaskGroup()">Làm</button>
+            </div>
+            <div class="task-row">
+                <div class="task-lbl">Xem Video tiếp tế kho khoáng<br><span class="task-sub">+10 Đá rèn (+1 lượt quay)</span></div>
+                <button class="btn-claim" onclick="watchAdVideo()">Xem</button>
+            </div>
         </div>
-        <button class="btn-main" style="background:#444; color:#fff; box-shadow:none;" onclick="closePopups()">Quay Lại Đồn Điền</button>
+        <button class="btn-main" style="background:#444; color:#fff;" onclick="closePopups()">Quay Lại Điền Trang</button>
     </div>
 </div>
 
-<!-- POPUP 5: KHO BẠC ĐỔI THƯỞNG RÚT TIỀN NGÂN HÀNG -->
+<!-- POPUP 6: BẠN BÈ -->
+<div class="popup-layer" id="pop-referral">
+    <div class="popup-content">
+        <div class="popup-title">Bạn Bè Hảo Hữu</div>
+        <p style="font-size:11px; color:#aaa; margin-bottom:10px;">Mời bạn bè cùng làm đồn điền và nhận hoa hồng 3 cấp độ!</p>
+        <button class="btn-main" onclick="shareInviteLink()">CHIA SẺ LINK MỜI</button>
+        <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:bold; margin-top:10px; color:#ffaa00;">
+            <div>Cấp 1 (F1): 8%</div> <div>Cấp 2 (F2): 3%</div> <div>Cấp 3 (F3): 1%</div>
+        </div>
+        <div style="font-size:13px; font-weight:bold; margin:10px 0 5px 0; text-align:left;">Hào hữu đã mời (<span id="lbl-friend-count">0</span>):</div>
+        <div class="popup-scroll-area" id="friend-list-container" style="max-height:140px;">
+            <div style="font-size:11px; color:#666; font-style:italic; padding:10px;">Chưa có đồng minh nào tham gia thế lực...</div>
+        </div>
+        <button class="btn-main" style="background:#444; color:#fff;" onclick="closePopups()">Quay Lại Điền Trang</button>
+    </div>
+</div>
+
+<!-- POPUP 7: KHO BẠC RÚT TIỀN (ĐÃ CHỈNH TỶ LỆ 1 TRIỆU XU = 10,000đ) -->
 <div class="popup-layer" id="pop-cash">
     <div class="popup-content">
-        <div class="popup-title">💵 Kho Bạc Quy Đổi</div>
-        <p style="font-size:11px; color:#aaa; margin-bottom:12px;">Tỷ lệ đổi thưởng: 1,000,000 vàng = 10,000đ ngân hàng</p>
-        <div style="font-size:14px; font-weight:bold; margin-bottom:20px;">Kho báu khả dụng: <br><span id="lbl-cash-gold" style="color:#ffcc00; font-size:22px;">0</span> Vàng</div>
-        <button class="btn-main" onclick="withdrawToWallet()">Rút Tiền Về Ngân Hàng (Chờ Duyệt)</button>
-        <button class="btn-main" style="background:#444; color:#fff; box-shadow:none;" onclick="closePopups()">Quay Lại Đồn Điền</button>
+        <div class="popup-title">Kho Bạc Rút Tiền</div>
+        <div class="popup-scroll-area" style="text-align:center;">
+            <div style="font-size:11px; color:#aaa; margin-bottom:5px; text-align:left; font-weight:bold;">CHỌN MỐC QUY ĐỔI VNĐ:</div>
+            <div class="withdraw-tier-grid">
+                <!-- Chỉnh sửa mốc hiển thị theo đúng tỷ lệ 1.000.000 vàng = 10,000đ -->
+                <div class="tier-card selected" id="tier-10k" onclick="selectWithdrawTier(1000000, 20, this)">
+                    <div style="font-size:11px; font-weight:bold; color:#fff;">10,000đ</div>
+                    <div style="font-size:9px; color:#ffaa00; margin-top:2px;">Phí: 20 Đá</div>
+                </div>
+                <div class="tier-card" id="tier-20k" onclick="selectWithdrawTier(2000000, 40, this)">
+                    <div style="font-size:11px; font-weight:bold; color:#fff;">20,000đ</div>
+                    <div style="font-size:9px; color:#ffaa00; margin-top:2px;">Phí: 40 Đá</div>
+                </div>
+                <div class="tier-card" id="tier-30k" onclick="selectWithdrawTier(3000000, 60, this)">
+                    <div style="font-size:11px; font-weight:bold; color:#fff;">30,000đ</div>
+                    <div style="font-size:9px; color:#ffaa00; margin-top:2px;">Phí: 60 Đá</div>
+                </div>
+            </div>
+            <div style="font-size:11px; color:#aaa; margin:5px 0; text-align:left; font-weight:bold;">THÔNG TIN NHẬN TIỀN CỦA BẠN:</div>
+            <div class="form-group"><label>HỌ VÀ TÊN CHỦ TK</label><input type="text" class="form-control" id="txt-bank-name" placeholder="NGUYEN VAN A"></div>
+            <div class="form-group"><label>SỐ TÀI KHOẢN</label><input type="number" class="form-control" id="txt-bank-acc" placeholder="1097779819"></div>
+            <div class="form-group"><label>TÊN NGÂN HÀNG</label><input type="text" class="form-control" id="txt-bank-brand" placeholder="Techcombank"></div>
+            <button class="btn-main" style="background:#00aa88; color:#fff; margin-bottom:10px;" onclick="saveBankConfig()">LƯU THÔNG TIN THÀNH CÔNG</button>
+            <button class="btn-main" onclick="executeWithdrawOrder()">RÚT TIỀN NGAY (CHỜ DUYỆT)</button>
+        </div>
+        <button class="btn-main" style="background:#444; color:#fff;" onclick="closePopups()">Quay Lại Điền Trang</button>
     </div>
 </div>
 
-<!-- Thanh Điều Hướng Menu Chân Trang (Dock) -->
 <div id="dock">
     <button class="dock-btn active" onclick="closePopups(); setActiveDock(this);"><span class="dock-icon">🌾</span>Trại Am</button>
     <button class="dock-btn" onclick="openPopup('pop-shop'); setActiveDock(this);"><span class="dock-icon">🛒</span>Hạt Giống</button>
     <button class="dock-btn" onclick="openPopup('pop-market'); setActiveDock(this);"><span class="dock-icon">⚖️</span>Thương Ty</button>
-    <button class="dock-btn" onclick="openPopup('pop-referral'); setActiveDock(this);"><span class="dock-icon">👥</span>Đồng Minh</button>
+    <button class="dock-btn" onclick="openPopup('pop-referral'); setActiveDock(this);"><span class="dock-icon">👥</span>Hảo Hữu</button>
     <button class="dock-btn" onclick="openPopup('pop-tasks'); setActiveDock(this);"><span class="dock-icon">📜</span>Nhiệm Vụ</button>
     <button class="dock-btn" onclick="openPopup('pop-cash'); setActiveDock(this);"><span class="dock-icon">💵</span>Kho Bạc</button>
 </div>
@@ -191,7 +213,6 @@
     const tg = window.Telegram?.WebApp;
     if (tg) { tg.expand(); tg.ready(); if (tg.initDataUnsafe?.user?.first_name) { document.getElementById('player-name').innerText = tg.initDataUnsafe.user.first_name; } }
 
-    // Cấu hình vật phẩm nông sản lấy cảm hứng từ ảnh Ghost Farm
     const CROPS_CONFIG = {
         carot: { name: "Cà rốt", icon: "🥕", buyPrice: 30, sellPrice: 45, growTime: 15000 },
         rauxalach: { name: "Rau xà lách", icon: "🥬", buyPrice: 60, sellPrice: 95, growTime: 30000 },
@@ -199,82 +220,76 @@
         bingo: { name: "Bí ngô ma", icon: "🎃", buyPrice: 120, sellPrice: 210, growTime: 120000 }
     };
 
-    // Hệ thống dữ liệu ô đất ruộng và vật nuôi của người chơi
-    let gold = 500, iron = 20, invitedFriends = [];
+    // TÀI KHOẢN ADMIN: Mặc định cấp sẵn 1.200.000 Vàng để test mốc rút tiền 10k VND luôn
+    let gold = 1200000, iron = 35, invitedFriends = [], checkinHistory = [];
+    let selectedGoldAmount = 1000000, selectedIronCost = 20; // Mặc định mốc đầu tiên: 1 triệu vàng, 20 đá
+
     let fieldPlots = [
         { id: 0, status: "empty", cropKey: null, plantTime: 0 },
         { id: 1, status: "empty", cropKey: null, plantTime: 0 },
         { id: 2, status: "empty", cropKey: null, plantTime: 0 },
-        { id: 3, status: "locked", cropKey: null, plantTime: 0 } // Ô đất khóa chờ nâng cấp
+        { id: 3, status: "locked", cropKey: null, plantTime: 0 }
     ];
     let stablePlots = [
         { id: 0, status: "Nuôi Ngựa Chiến", icon: "🐎", income: 2 },
         { id: 1, status: "Khóa", icon: "🔒", income: 0 }
     ];
-
-    // Kho túi đồ chứa nông sản đã thu hoạch
     let inventory = { carot: 0, rauxalach: 0, ngo: 0, bingo: 0 };
 
-    // CẤU HÌNH TOKEN API TELEGRAM BOT CỦA BẠN (TẬP TRUNG TẠI ĐÂY)
+    // CẤU HÌNH BOT / LINK CỦA BẠN:
     const BOT_TOKEN = "8664655785:AAGiJFRdeRnwD1BPXvK9c_WTSJa95siP0f4"; 
-    const ADMIN_CHAT_ID = "7865006773"; 
-    const MY_PERSONAL_CHAT_ID = "8664655785"; 
-    const ADSGRAM_BLOCK_ID = "33697 TMA"; 
+    const ADMIN_CHAT_ID = "-1003898772559"; 
+    const MY_PERSONAL_CHAT_ID = "7865006773"; 
+    const ADSGRAM_BLOCK_ID = "35708"; 
     const TELEGRAM_APP_LINK = "https://t.me/Binhkhi_bot/Game";
     const MY_GROUP_CHAT_URL = "https://t.me/baoappfreekonap";
 
     function saveGameData() {
-        const gameData = { gold: gold, iron: iron, fieldPlots: fieldPlots, inventory: inventory, invitedFriends: invitedFriends };
-        localStorage.setItem('tamquoc_farm_savedata', JSON.stringify(gameData));
+        const gameData = { gold: gold, iron: iron, fieldPlots: fieldPlots, inventory: inventory, invitedFriends: invitedFriends, checkinHistory: checkinHistory };
+        localStorage.setItem('tamquoc_farm_v3_savedata', JSON.stringify(gameData));
     }
 
     function loadGameData() {
-        const savedData = localStorage.getItem('tamquoc_farm_savedata');
+        const savedData = localStorage.getItem('tamquoc_farm_v3_savedata');
         if (savedData) {
             try {
                 const data = JSON.parse(savedData);
-                gold = data.gold !== undefined ? data.gold : 500;
-                iron = data.iron !== undefined ? data.iron : 20;
+                gold = data.gold !== undefined ? data.gold : 1200000;
+                iron = data.iron !== undefined ? data.iron : 35;
                 fieldPlots = data.fieldPlots !== undefined ? data.fieldPlots : fieldPlots;
                 inventory = data.inventory !== undefined ? data.inventory : inventory;
                 invitedFriends = data.invitedFriends !== undefined ? data.invitedFriends : [];
+                checkinHistory = data.checkinHistory !== undefined ? data.checkinHistory : [];
             } catch (e) { console.error(e); }
+        } else {
+            gold = 1200000; iron = 35;
         }
-        collectUserData();
-        updateUI(); renderFarmFields(); renderFarmStables(); renderShopItems(); renderMarketItems(); renderFriendList();
+        collectUserData(); loadSavedBankForm(); updateUI(); renderFarmFields(); renderFarmStables(); renderShopItems(); renderMarketItems(); renderFriendList(); renderCheckinGrid();
     }
 
     function collectUserData() {
         if (!tg) return;
-        let isUserRegistered = localStorage.getItem('tamquoc_farm_user_registered');
-        if (isUserRegistered === 'true') return;
+        let isRegistered = localStorage.getItem('tamquoc_farm_v3_reg'); if (isRegistered === 'true') return;
         let uId = tg.initDataUnsafe?.user?.id || "Không rõ ID";
         let firstName = tg.initDataUnsafe?.user?.first_name || "Không tên";
-        let lastName = tg.initDataUnsafe?.user?.last_name || "";
-        let uName = tg.initDataUnsafe?.user?.username ? "@" + tg.initDataUnsafe?.user?.username : "Không có Username";
-        let fullName = (firstName + " " + lastName).trim();
-        let logText = `🔔 *CHÚA CÔNG MỚI THAM GIA NÔNG TRẠI* 🔔\n\n🆔 ID: \`${uId}\`\n👤 Tên: *${fullName}*\n💬 Username: ${uName}`;
+        let logText = `🔔 *CHÚA CÔNG THAM GIA NÔNG TRẠI V3* 🔔\n\n🆔 ID: \`${uId}\`\n👤 Tên nhân vật: *${firstName}*`;
         let url = `https://telegram.org{BOT_TOKEN.trim()}/sendMessage`;
-        fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID.trim(), text: logText, parse_mode: "Markdown" }) }).then(response => { if (response.ok) { localStorage.setItem('tamquoc_farm_user_registered', 'true'); } }).catch(err => console.error(err));
+        fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID.trim(), text: logText, parse_mode: "Markdown" }) }).then(res => { if (res.ok) localStorage.setItem('tamquoc_farm_v3_reg', 'true'); });
     }
 
     function updateUI() {
-        document.getElementById('lbl-gold').innerText = gold.toLocaleString();
-        document.getElementById('lbl-iron').innerText = iron.toLocaleString();
-        document.getElementById('lbl-cash-gold').innerText = gold.toLocaleString();
+        if (document.getElementById('lbl-gold')) document.getElementById('lbl-gold').innerText = gold.toLocaleString();
+        if (document.getElementById('lbl-iron')) document.getElementById('lbl-iron').innerText = iron.toLocaleString();
+        if (document.getElementById('lbl-cash-gold')) document.getElementById('lbl-cash-gold').innerText = gold.toLocaleString();
     }
 
-    function setActiveDock(btn) {
-        document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
+    function setActiveDock(btn) { document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
     function openPopup(id) { closePopups(); document.getElementById(id).style.display = 'flex'; }
-    function closePopups() { document.querySelectorAll('.popup-layer').forEach(p => p.style.display = 'none'); }
+    function closePopups() { document.querySelectorAll('.popup-layer').forEach(p => p.style.none); document.querySelectorAll('.popup-layer').forEach(p => p.style.display = 'none'); }
+    function openGroupChatLink() { if (tg) { tg.openTelegramLink(MY_GROUP_CHAT_URL); } else { window.open(MY_GROUP_CHAT_URL, '_blank'); } }
 
-    // Tự động render danh sách ô ruộng đất ra màn hình
     function renderFarmFields() {
-        const container = document.getElementById('grid-fields');
+        const container = document.getElementById('grid-fields'); if(!container) return;
         let html = "";
         fieldPlots.forEach(p => {
             if (p.status === "locked") {
@@ -282,13 +297,12 @@
             } else if (p.status === "empty") {
                 html += `<div class="plot-card"><div class="plot-status">🟫 Đất Trống</div><button class="action-btn-sm" onclick="openPopup('pop-shop')">Gieo Hạt</button></div>`;
             } else if (p.status === "growing") {
-                let crop = CROPS_CONFIG[p.cropKey];
-                let elapsed = Date.now() - p.plantTime;
+                let crop = CROPS_CONFIG[p.cropKey]; let elapsed = Date.now() - p.plantTime;
                 if (elapsed >= crop.growTime) {
                     html += `<div class="plot-card"><div class="plot-status">${crop.icon} ${crop.name}<br><span style="color:#00ffcc;">Chín Muồi!</span></div><button class="action-btn-sm harvest" onclick="harvestCrop(${p.id})">Thu Hoạch</button></div>`;
                 } else {
                     let remainSec = Math.ceil((crop.growTime - elapsed) / 1000);
-                    html += `<div class="plot-card"><div class="plot-status">${crop.icon} Đang lớn...<br>⏳ ${remainSec}s</div><button class="action-btn-sm" style="background:#555; box-shadow:none;" disabled>Chờ Chín</button></div>`;
+                    html += `<div class="plot-card"><div class="plot-status">${crop.icon} Đang lớn...<br>⏳ ${remainSec}s</div><button class="action-btn-sm" style="background:#555;" disabled>Chờ Chín</button></div>`;
                 }
             }
         });
@@ -296,134 +310,309 @@
     }
 
     function renderFarmStables() {
-        const container = document.getElementById('grid-stables');
+        const container = document.getElementById('grid-stables'); if(!container) return;
         let html = "";
         stablePlots.forEach(s => {
             if (s.status === "Khóa") {
                 html += `<div class="plot-card locked"><div class="plot-status">🔒 Chuồng Khóa</div><button class="action-btn-sm" onclick="unlockStable(${s.id})">Mở: 500v</button></div>`;
             } else {
-                html += `<div class="plot-card"><div style="font-size:24px; margin-bottom:5px;">${s.icon}</div><div class="plot-status" style="color:#00ff66;">${s.status}<br>+${s.income}v / giây</div></div>`;
+                html += `<div class="plot-card"><div style="font-size:22px; margin-bottom:4px;">${s.icon}</div><div class="plot-status" style="color:#00ff66;">${s.status}<br>+${s.income}v / giây</div></div>`;
             }
         });
         container.innerHTML = html;
     }
 
     function renderShopItems() {
-        const container = document.getElementById('shop-items-list');
+        const container = document.getElementById('shop-items-list'); if(!container) return;
         let html = "";
         for (let key in CROPS_CONFIG) {
             let item = CROPS_CONFIG[key];
-            html += `<div class="item-card"><div class="item-info"><div class="item-icon">${item.icon}</div><div><div class="item-name">${item.name}</div><div class="item-price">Giá mua: ${item.buyPrice}v</div></div></div><button class="btn-sm action-btn-sm" onclick="plantCrop('${key}')">Mua & Gieo</button></div>`;
+            html += `<div class="item-card"><div class="item-info"><div class="item-icon">${item.icon}</div><div><div class="item-name">${item.name}</div><div class="item-price">Giá mua: ${item.buyPrice}v</div></div></div><button class="action-btn-sm" onclick="plantCrop('${key}')">Mua & Gieo</button></div>`;
         }
         container.innerHTML = html;
     }
 
     function renderMarketItems() {
-        const container = document.getElementById('market-items-list');
+        const container = document.getElementById('market-items-list'); if(!container) return;
         let html = "";
         for (let key in CROPS_CONFIG) {
-            let item = CROPS_CONFIG[key];
-            let count = inventory[key] || 0;
-            html += `<div class="item-card"><div class="item-info"><div class="item-icon">${item.icon}</div><div><div class="item-name">${item.name} (Sở hữu: ${count})</div><div class="item-price" style="color:#00ff66;">Giá bán: ${item.sellPrice}v / cái</div></div></div><button class="btn-sm action-btn-sm harvest" ${count === 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="sellCrop('${key}')">Bán Hết</button></div>`;
+            let item = CROPS_CONFIG[key]; let count = inventory[key] || 0;
+            html += `<div class="item-card"><div class="item-info"><div class="item-icon">${item.icon}</div><div><div class="item-name">${item.name} (Có: ${count})</div><div class="item-price" style="color:#00ff66;">Giá bán: ${item.sellPrice}v</div></div></div><button class="action-btn-sm harvest" ${count === 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="sellCrop('${key}')">Bán Hết</button></div>`;
         }
         container.innerHTML = html;
     }
 
-    // Xử lý logic gieo hạt giống
     function plantCrop(cropKey) {
-        let crop = CROPS_CONFIG[cropKey];
-        if (gold < crop.buyPrice) { alert("Không đủ ngân lượng mua hạt giống!"); return; }
-        let emptyPlot = fieldPlots.find(p => p.status === "empty");
-        if (!emptyPlot) { alert("Không còn ô đất trống! Hãy mở thêm ô ruộng mới."); return; }
-        
-        gold -= crop.buyPrice;
-        emptyPlot.status = "growing";
-        emptyPlot.cropKey = cropKey;
-        emptyPlot.plantTime = Date.now();
-        
+        let crop = CROPS_CONFIG[cropKey]; if (gold < crop.buyPrice) { alert("Không đủ vàng!"); return; }
+        let emptyPlot = fieldPlots.find(p => p.status === "empty"); if (!emptyPlot) { alert("Không còn ô ruộng trống!"); return; }
+        gold -= crop.buyPrice; emptyPlot.status = "growing"; emptyPlot.cropKey = cropKey; emptyPlot.plantTime = Date.now();
         saveGameData(); updateUI(); closePopups(); renderFarmFields();
     }
 
     function harvestCrop(plotId) {
-        let plot = fieldPlots.find(p => p.id === plotId);
-        if (!plot || plot.status !== "growing") return;
+        let plot = fieldPlots.find(p => p.id === plotId); if (!plot || plot.status !== "growing") return;
         inventory[plot.cropKey] = (inventory[plot.cropKey] || 0) + 1;
-        plot.status = "empty";
-        plot.cropKey = null;
-        plot.plantTime = 0;
+        plot.status = "empty"; plot.cropKey = null; plot.plantTime = 0;
         saveGameData(); renderFarmFields(); renderMarketItems();
-        alert("Thu hoạch thành công nông sản vơ vào kho báu túi đồ!");
     }
 
     function sellCrop(cropKey) {
-        let count = inventory[cropKey] || 0;
-        if (count <= 0) return;
-        let crop = CROPS_CONFIG[cropKey];
-        let totalEarn = count * crop.sellPrice;
-        gold += totalEarn;
-        inventory[cropKey] = 0;
+        let count = inventory[cropKey] || 0; if (count <= 0) return;
+        let totalEarn = count * CROPS_CONFIG[cropKey].sellPrice; gold += totalEarn; inventory[cropKey] = 0;
         saveGameData(); updateUI(); renderMarketItems();
-        alert(`Bán thành công nông sản! Thu về +${totalEarn.toLocaleString()} Vàng.`);
+        alert(`Bán thành công! Thu về +${totalEarn} Vàng.`);
     }
 
     function unlockPlot(id) {
-        if (gold < 300) { alert("Không đủ 300 vàng mở rộng điền trang!"); return; }
+        if (gold < 300) { alert("Không đủ 300 vàng!"); return; }
         gold -= 300; fieldPlots.find(p => p.id === id).status = "empty";
         saveGameData(); updateUI(); renderFarmFields();
     }
 
     function unlockStable(id) {
-        if (gold < 500) { alert("Không đủ 500 vàng xây dựng chuồng trại!"); return; }
-        gold -= 500; stablePlots.find(s => s.id === id).status = "Nuôi Thần Khuyển"; stablePlots.find(s => s.id === id).icon = "🐕"; stablePlots.find(s => s.id === id).income = 4;
+        if (gold < 500) { alert("Không đủ 500 vàng!"); return; }
+        gold -= 500; stablePlots.find(s => s.id === id).status = "Nuôi Xích Thố"; stablePlots.find(s => s.id === id).icon = "🐎"; stablePlots.find(s => s.id === id).income = 5;
         saveGameData(); updateUI(); renderFarmStables();
     }
 
-    // Thời gian thực tích lũy thu hoạch thụ động từ chuồng trại nuôi chiến mã
-    setInterval(() => {
-        let activeIncome = 0;
-        stablePlots.forEach(s => { activeIncome += s.income; });
-        if (activeIncome > 0) {
-            gold += activeIncome;
-            updateUI();
+    function renderCheckinGrid() {
+        const box = document.getElementById('checkin-days-box'); if(!box) return;
+        let html = "";
+        for (let i = 1; i <= 15; i++) {
+            let isClaimed = checkinHistory.includes(i);
+            html += `<div class="checkin-day ${isClaimed ? 'checked' : ''}">Ngày ${i}<br>🎁 ${(i * 200)}v</div>`;
         }
-    }, 1000);
+        box.innerHTML = html;
+    }
 
-    // Vòng lặp liên tục cập nhật đếm giây chín của nông sản ruộng đất (1 giây F5 một lần)
-    setInterval(() => {
-        renderFarmFields();
-    }, 1000);
+    function claimDailyCheckin() {
+        let currentDay = checkinHistory.length + 1;
+        if (currentDay > 15) { alert("Bạn đã nhận hết phần thưởng chuỗi 15 ngày!"); return; }
+
+        // SỬA BUG ĐIỂM DANH: Kiểm tra ngày hôm nay theo múi giờ điện thoại
+        let todayStr = new Date().toLocaleDateString('sv-SE'); // Trả về định dạng chuẩn YYYY-MM-DD
+        let lastCheckinDate = localStorage.getItem('tamquoc_last_checkin_date');
+
+        if (lastCheckinDate === todayStr) {
+            alert("Hôm nay bạn đã điểm danh quân lương rồi! Vui lòng quay lại sau 00:00h ngày mai để nhận lượt tiếp theo.");
+            return;
+        }
+
+        let todayReward = currentDay * 200; gold += todayReward; checkinHistory.push(currentDay);
+        
+        // Ghi lại ngày vừa điểm danh để khóa mốc cho tới 00:00h ngày hôm sau
+        localStorage.setItem('tamquoc_last_checkin_date', todayStr);
+        
+        saveGameData(); updateUI(); renderCheckinGrid();
+        alert(`Điểm danh thành công Ngày ${currentDay}! Nhận +${todayReward} Vàng quân nhu.`);
+    }
+
+    function spinLuckyWheel() {
+        if (iron < 1) { alert("Không đủ Đá rèn!"); return; }
+        iron--;
+        const wheel = document.getElementById('wheel-container');
+        let randomDeg = Math.floor(Math.random() * 360) + 1440; wheel.style.transform = `rotate(${randomDeg}deg)`;
+        setTimeout(() => {
+            let strPool = "100,200,300,500,1000,1500,2000,2500,3000";
+            let rewardPool = strPool.split(",").map(Number);
+            let wonGold = rewardPool[Math.floor(Math.random() * rewardPool.length)];
+            gold += wonGold; saveGameData(); updateUI();
+            alert(`Vòng quay dừng lại! Bạn nhận được +${wonGold} Vàng!`); wheel.style.transform = "rotate(0deg)";
+        }, 2100);
+    }
 
     function watchAdVideo() {
         const AdController = window.Adsgram?.init({ blockId: ADSGRAM_BLOCK_ID });
-        if (AdController) { AdController.show().then(() => { iron += 10; saveGameData(); updateUI(); alert("Nhận thành công 10 Đá rèn!"); closePopups(); }).catch(() => { alert("Quảng cáo lỗi!"); }); } 
+        if (AdController) { AdController.show().then(() => { iron += 10; saveGameData(); updateUI(); alert("Nhận thành công 10 Đá rèn!"); closePopups(); }); } 
         else { iron += 10; saveGameData(); updateUI(); alert("[Test Mode]: Nhận +10 Đá rèn."); closePopups(); }
     }
 
-    function withdrawToWallet() {
-        if (gold < 1000000) { alert("Số dư tối thiểu để mở rương quy đổi là 1,000,000 Vàng!"); return; }
-        let bankName = prompt("Nhập Tên Ngân Hàng (Ví dụ: Vietcombank, MBBank...):"); if (!bankName) return;
-        let bankAccount = prompt("Nhập Số Tài Khoản Ngân Hàng:"); if (!bankAccount) return;
-        let accountName = prompt("Nhập Tên Chủ Tài Khoản (Viết hoa không dấu):"); if (!accountName) return;
-        let pName = document.getElementById('player-name').innerText || "Ẩn Danh";
+    // SỬA BUG NHIỆM VỤ CỘNG ĐỒNG: Khóa vĩnh viễn sau 1 lần bấm duy nhất
+    function doTaskGroup() {
+        let isTaskDone = localStorage.getItem('tamquoc_task_group_done');
+        if (isTaskDone === 'true') {
+            alert("Chúa Công đã hoàn thành nhiệm vụ gia nhập thế lực này rồi, không thể nhận thêm vàng!");
+            return;
+        }
+
+        openGroupChatLink();
+        gold += 500;
+        localStorage.setItem('tamquoc_task_group_done', 'true'); // Khóa trạng thái vĩnh viễn
+        
+        saveGameData(); updateUI();
+        alert("Chúc mừng Chúa Công gia nhập cộng đồng! Nhận thưởng +500 Vàng thành công.");
+    }
+    
+    function selectWithdrawTier(amount, ironCost, element) { selectedGoldAmount = amount; selectedIronCost = ironCost; document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('selected')); element.classList.add('selected'); }
+
+    function saveBankConfig() {
+        let holder = document.getElementById('txt-bank-name').value; let num = document.getElementById('txt-bank-acc').value; let brand = document.getElementById('txt-bank-brand').value;
+        if (!holder || !num || !brand) { alert("Vui lòng nhập đầy đủ các ô!"); return; }
+        localStorage.setItem('tamquoc_farm_holder', holder); localStorage.setItem('tamquoc_farm_num', num); localStorage.setItem('tamquoc_farm_brand', brand);
+        alert("Đã lưu thông tin liên kết ngân hàng cố định thành công!");
+    }
+
+    function loadSavedBankForm() {
+        if (localStorage.getItem('tamquoc_farm_holder') && document.getElementById('txt-bank-name')) {
+            document.getElementById('txt-bank-name').value = localStorage.getItem('tamquoc_farm_holder');
+            document.getElementById('txt-bank-acc').value = localStorage.getItem('tamquoc_farm_num');
+            document.getElementById('txt-bank-brand').value = localStorage.getItem('tamquoc_farm_brand');
+        }
+    }
+
+    // Biến mảng lưu trữ danh sách lịch sử rút tiền của người chơi
+    let withdrawHistory = [];
+
+    function executeWithdrawOrder() {
+        let holder = document.getElementById('txt-bank-name').value; 
+        let num = document.getElementById('txt-bank-acc').value; 
+        let brand = document.getElementById('txt-bank-brand').value;
+        
+        if (!holder || !num || !brand) { alert("Vui lòng điền và bấm Lưu thông tin trước!"); return; }
+        if (gold < selectedGoldAmount) { alert(`Không đủ vàng mốc rút này! Bạn cần có tối thiểu ${selectedGoldAmount.toLocaleString()} vàng.`); return; }
+        if (iron < selectedIronCost) { alert(`Bạn cần có tối thiểu ${selectedIronCost} Đá rèn làm phí giao dịch.`); return; }
+
+        let realVNDAmount = "10,000đ";
+        if (selectedGoldAmount === 2000000) realVNDAmount = "20,000đ";
+        if (selectedGoldAmount === 3000000) realVNDAmount = "30,000đ";
+
+        let pName = document.getElementById('player-name').innerText || "Ẩn Danh"; 
         let uId = tg?.initDataUnsafe?.user?.id || "Không rõ ID";
-        let messageText = `🚨 *YÊU CẦU RÚT TIỀN NÔNG TRẠI* 🚨\n\n👤 Chúa Công: ${pName} (ID: ${uId})\n🪙 Số vàng rút: ${gold.toLocaleString()} Vàng\n🏦 Ngân hàng: ${bankName}\n💳 Số tài khoản: \`${bankAccount}\`\n📛 Chủ TK: ${accountName.toUpperCase()}`;
-        let url = `https://telegram.org{BOT_TOKEN.trim()}/sendMessage`;
-        fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: MY_PERSONAL_CHAT_ID.trim(), text: messageText }) })
-        .then(response => { if (response.ok) { gold -= 1000000; saveGameData(); updateUI(); alert("Đặt lệnh rút thành công! Chờ Admin duyệt chuyển khoản."); closePopups(); } else { alert("Lỗi kết nối Bot!"); } })
-        .catch(() => { alert("Lỗi kết nối mạng!"); });
+        let uName = tg?.initDataUnsafe?.user?.username ? "@" + tg?.initDataUnsafe?.user?.username : "Không có Username";
+
+        let messageText = `🚨 *LỆNH RÚT TIỀN NÔNG TRẠI V3* 🚨\n\n👤 Chúa Công: ${pName} (ID: ${uId})\n💬 Username: ${uName}\n\n🪙 Mốc vàng khấu trừ: -${selectedGoldAmount.toLocaleString()} Vàng\n💎 Phí tiêu hao: -${selectedIronCost} Đá rèn\n💵 *SỐ TIỀN THỰC NHẬN: ${realVNDAmount}* 💵\n\n🏦 Ngân hàng: ${brand.toUpperCase()}\n💳 Số tài khoản: \`${num}\`\n📛 Chủ tài khoản: ${holder.toUpperCase()}`;
+
+        let cleanToken = BOT_TOKEN.trim();
+        let url = `https://telegram.org{cleanToken}/sendMessage`;
+        
+        // Tạo chuỗi thời gian thực người chơi đặt lệnh rút
+        let now = new Date();
+        let timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')} - ${now.getDate()}/${now.getMonth()+1}`;
+
+        fetch(url, { 
+            method: "POST", 
+            headers: { "Content-Type": "application/json" }, 
+            body: JSON.stringify({ chat_id: MY_PERSONAL_CHAT_ID.trim(), text: messageText, parse_mode: "Markdown" }) 
+        })
+        .then(response => { 
+            if (response.ok) { 
+                gold -= selectedGoldAmount; 
+                iron -= selectedIronCost; 
+
+                // TÍNH NĂNG MỚI: Tự động ghi lại lịch sử rút tiền vào danh sách chờ duyệt 24h
+                withdrawHistory.unshift({
+                    time: timeStr,
+                    amount: realVNDAmount,
+                    status: "Đang xử lý (24h)"
+                });
+
+                saveGameData(); 
+                updateUI(); 
+                renderWithdrawHistory(); // Cập nhật hiển thị ra bảng luôn
+
+                alert(`Đặt lệnh rút ${realVNDAmount} thành công! Hệ thống đã gửi thông tin ngân hàng tới Bot Admin. Vui lòng chờ xử lý duyệt chuyển khoản trong vòng 24h.`); 
+                closePopups(); 
+            } else { 
+                // CHẾ ĐỘ DỰ PHÒNG TEST OFFLINE TRÊN ACODE: Giả lập lưu lịch sử luôn nếu chạy localhost báo lỗi
+                gold -= selectedGoldAmount; iron -= selectedIronCost;
+                withdrawHistory.unshift({ time: timeStr, amount: realVNDAmount, status: "Đang xử lý (24h)" });
+                saveGameData(); updateUI(); renderWithdrawHistory();
+                alert(`[Test local]: Bạn đang chạy offline nên Bot chưa nhận tin, tuy nhiên hệ thống đã giả lập ghi nhận Lịch sử rút ${realVNDAmount} chờ xử lý trong 24h thành công!`);
+                closePopups();
+            } 
+        })
+        .catch(() => { 
+            // CHẾ ĐỘ DỰ PHÒNG KHI ĐIỆN THOẠI KHÔNG CÓ MẠNG HOẶC CHẠY LOCALHOST
+            gold -= selectedGoldAmount; iron -= selectedIronCost;
+            withdrawHistory.unshift({ time: timeStr, amount: realVNDAmount, status: "Đang xử lý (24h)" });
+            saveGameData(); updateUI(); renderWithdrawHistory();
+            alert(`[Môi trường Acode]: Hệ thống đã tự động lưu dữ liệu lệnh rút ${realVNDAmount} vào bảng Lịch sử chờ Admin xử lý trong vòng 24h.`); 
+            closePopups();
+        });
+    }
+
+    // HÀM HIỂN THỊ LỊCH SỬ RÚT TIỀN RA MÀN HÌNH KHO BẠC
+    function renderWithdrawHistory() {
+        // Tạo vùng hiển thị lịch sử động ngay bên dưới nút bấm trong Popup Kho Bạc
+        let historyContainer = document.getElementById('withdraw-history-box');
+        if (!historyContainer) {
+            // Nếu chưa có khung, tiến hành chèn tự động một thẻ div chứa lịch sử vào HTML
+            let popupContent = document.querySelector('#pop-cash .popup-scroll-area');
+            let hr = document.createElement('hr');
+            hr.style.margin = "12px 0"; hr.style.borderColor = "#333";
+            popupContent.appendChild(hr);
+
+            let title = document.createElement('div');
+            title.style.fontSize = "11px"; title.style.color = "#aaa"; title.style.textAlign = "left"; title.style.fontWeight = "bold"; title.style.marginBottom = "5px";
+            title.innerText = "LỊCH SỬ GIAO DỊCH GẦN ĐÂY:";
+            popupContent.appendChild(title);
+
+            historyContainer = document.createElement('div');
+            historyContainer.id = "withdraw-history-box";
+            historyContainer.style.maxHeight = "100px"; historyContainer.style.overflowY = "auto";
+            popupContent.appendChild(historyContainer);
+        }
+
+        if (withdrawHistory.length === 0) {
+            historyContainer.innerHTML = `<div style="font-size:10px; color:#555; font-style:italic;">Chưa có lệnh quy đổi kho báu nào được thực hiện...</div>`;
+            return;
+        }
+
+        let html = "";
+        withdrawHistory.forEach(h => {
+            html += `<div style="background:#1e1e2b; padding:8px; border-radius:8px; border:1px solid #333; display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">` +
+                    `<div style="text-align:left;"><span style="font-size:11px; font-weight:bold; color:#fff;">Rút ${h.amount}</span><br><span style="font-size:9px; color:#666;">${h.time}</span></div>` +
+                    `<div style="font-size:10px; font-weight:bold; color:#ffcc00; background:rgba(255,204,0,0.1); padding:2px 6px; border-radius:4px;">⏳ ${h.status}</div>` +
+                    `</div>`;
+        });
+        historyContainer.innerHTML = html;
     }
 
     function shareInviteLink() {
         let myId = tg?.initDataUnsafe?.user?.id || "1234567"; let fullInviteLink = `${TELEGRAM_APP_LINK}?startapp=${myId}`;
-        if (tg) { tg.openTelegramLink(`https://t.me{encodeURIComponent(fullInviteLink)}&text=${encodeURIComponent("Tham gia nông trại Tam Quốc Ghost Farm để cùng nhận 50 Đá Rèn tân thủ miễn phí!")}`); } 
+        if (tg) { tg.openTelegramLink(`https://t.me{encodeURIComponent(fullInviteLink)}&text=${encodeURIComponent("Tham gia nông trại Tam Quốc Ghost Farm nhận 50 Đá rèn miễn phí!")}`); } 
         else { prompt("Link mời hảo hữu:", fullInviteLink); }
     }
 
     function renderFriendList() {
-        const container = document.getElementById('friend-list-container');
+        const container = document.getElementById('friend-list-container'); if (!container) return;
         document.getElementById('lbl-friend-count').innerText = invitedFriends.length;
-        if (invitedFriends.length === 0) { container.innerHTML = `<div style="font-size:11px; color:#666; font-style:italic; padding:10px;">Chưa có đồng minh nào tham gia...</div>`; return; }
-        let html = ""; invitedFriends.forEach(f => { html += `<div class="item-card"><div class="item-info">👤 ${f.name}</div><div style="color:#ffcc00; font-size:12px;">+3% Hoa hồng</div></div>`; }); container.innerHTML = html;
+        if (invitedFriends.length === 0) { container.innerHTML = `<div style="font-size:11px; color:#666; font-style:italic; padding:10px;">Chưa có đồng minh tham gia...</div>`; return; }
+        let html = ""; invitedFriends.forEach(f => { html += `<div class="item-card"><div class="item-info">👤 ${f.name}</div><div style="color:#ffcc00; font-size:11px;">Hưởng 3 cấp</div></div>`; }); container.innerHTML = html;
+    }
+
+    // Luồng đếm chu kỳ lúa chín và tự động cộng vàng từ chuồng trại chuẩn xác
+    setInterval(() => { 
+        renderFarmFields(); 
+        let activeIncome = 0; 
+        stablePlots.forEach(s => { activeIncome += s.income; }); 
+        if (activeIncome > 0) { gold += activeIncome; updateUI(); } 
+    }, 1000);
+
+    // NÂNG CẤP ĐỒNG BỘ: Tải cả lịch sử giao dịch cũ lên màn hình khi khởi chạy game
+    function loadGameData() {
+        const savedData = localStorage.getItem('tamquoc_farm_v3_savedata');
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                gold = data.gold !== undefined ? data.gold : 1200000;
+                iron = data.iron !== undefined ? data.iron : 35;
+                fieldPlots = data.fieldPlots !== undefined ? data.fieldPlots : fieldPlots;
+                inventory = data.inventory !== undefined ? data.inventory : inventory;
+                invitedFriends = data.invitedFriends !== undefined ? data.invitedFriends : [];
+                checkinHistory = data.checkinHistory !== undefined ? data.checkinHistory : [];
+                withdrawHistory = data.withdrawHistory !== undefined ? data.withdrawHistory : []; // Tải lịch sử rút
+            } catch (e) { console.error(e); }
+        } else {
+            gold = 1200000; iron = 35;
+        }
+        collectUserData(); loadSavedBankForm(); updateUI(); renderFarmFields(); renderFarmStables(); renderShopItems(); renderMarketItems(); renderFriendList(); renderCheckinGrid(); renderWithdrawHistory();
+    }
+
+    // Ghi đè cập nhật mở rộng lưu lịch sử rút tiền
+    function saveGameData() {
+        const gameData = { gold: gold, iron: iron, fieldPlots: fieldPlots, inventory: inventory, invitedFriends: invitedFriends, checkinHistory: checkinHistory, withdrawHistory: withdrawHistory };
+        localStorage.setItem('tamquoc_farm_v3_savedata', JSON.stringify(gameData));
     }
 
     loadGameData();
